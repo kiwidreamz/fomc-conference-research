@@ -1,6 +1,7 @@
 rm(list = ls())
 library(pdftools)
 library(stringr)
+library(tm)
 
 
 # Directories paths
@@ -56,7 +57,7 @@ for (year in years) {
     text_content <- readLines(text_files[i], warn = FALSE)
     # Combine text lines into a single string
     txt_text <- paste(text_content, collapse = " ")
-    
+    # 
     # Remove line breaks and extra spaces
     txt_text <- gsub("[\r\n\t]", "", txt_text)  # Remove line breaks, tabs, etc.
     txt_text <- gsub("\\s+", " ", txt_text)  # Remove multiple spaces
@@ -64,9 +65,68 @@ for (year in years) {
     txt_text <- gsub("https?://\\S+\\b", "", txt_text)  # Remove hyperlinks
     txt_text <- tolower(txt_text) # Convert text to lowercase
     
+    # Find the index where the desired text starts ("Annual Organizational Matters" or "Developments in Financial Markets and Open Market Operations")
+    start_index <- regexpr("annual organizational matters", txt_text, ignore.case = TRUE)
+    
+    # If the first mention is not found, check for the second mention
+    if (start_index <= 0) {
+      start_index <- regexpr("developments? in financial markets and open market operations", txt_text, ignore.case = TRUE)
+    }
+    
+    # If the desired text is found, extract the text starting from that point
+    if (start_index > 0) {
+      txt_text <- substr(txt_text, start_index, nchar(txt_text))
+    } else {
+      # If the desired text is not found, keep the original text
+      warning(paste("Specified text not found in the document:", text_files[i]))
+    }
+    
     # Store text in the list, using the file name as the variable name
     minutes_list[[paste0(year, "_txt_", i)]] <- txt_text
   }
 }
 
 print(minutes_list[["2020_txt_1"]])
+
+# Define stopwords
+stopwords_en <- stopwords("en")
+print(stopwords_en)
+
+# Create new lists to store text without stopwords
+transcripts_list_nostopwords <- list()
+minutes_list_nostopwords <- list()
+
+# Loop through transcripts_list
+for (key in names(transcripts_list)) {
+  # Remove stopwords from transcripts
+  processed_text <- paste(
+    setdiff(
+      unlist(strsplit(transcripts_list[[key]], "\\s+")),
+      stopwords_en
+    ),
+    collapse = " "
+  )
+  
+  # Store processed text in new list
+  transcripts_list_nostopwords[[paste0(key, "_nostopwords")]] <- processed_text
+}
+
+# Loop through minutes_list
+for (key in names(minutes_list)) {
+  # Remove stopwords from minutes
+  processed_text <- paste(
+    setdiff(
+      unlist(strsplit(minutes_list[[key]], "\\s+")),
+      stopwords_en
+    ),
+    collapse = " "
+  )
+  
+  # Store processed text in new list
+  minutes_list_nostopwords[[paste0(key, "_nostopwords")]] <- processed_text
+}
+
+print(minutes_list_nostopwords[["2020_txt_1_nostopwords"]])
+
+
+
