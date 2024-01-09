@@ -3,6 +3,9 @@ library(pdftools)
 library(stringr)
 library(tm)
 
+################################
+#IMPORTING AND PROCESSING
+################################
 
 # Directories paths
 transcripts_directory <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/transcripts"
@@ -43,6 +46,35 @@ for (year in years) {
 }
 
 print(transcripts_list[["2020_pdf_1"]])
+
+# Initialize empty lists
+statements_list <- list()
+q_and_a_list <- list()
+
+# Loop through each transcript
+for (transcript_name in names(transcripts_list)) {
+  transcript_text <- transcripts_list[[transcript_name]]
+  
+  # Find the position of "our questions" or "few questions"
+  question_index <- regexpr("our questions|few questions", transcript_text, ignore.case = TRUE)
+  
+  # Check if "our questions" or "few questions" is found
+  if (question_index == -1) {
+    warning(paste("Markers 'our questions' or 'few questions' not found in:", transcript_name))
+  } else {
+    # Extract statement and Q&A based on the marker position
+    statement_text <- substr(transcript_text, 1, question_index)
+    q_and_a_text <- substr(transcript_text, question_index + attr(question_index, "match.length"), nchar(transcript_text))
+    
+    # Store in respective lists
+    statements_list[[transcript_name]] <- statement_text
+    q_and_a_list[[transcript_name]] <- q_and_a_text
+  }
+}
+
+print(statements_list[["2020_pdf_1"]])
+print(q_and_a_list[["2020_pdf_1"]])
+
 
 # Loop through each year's folder for minutes
 for (year in years) {
@@ -127,6 +159,11 @@ for (key in names(minutes_list)) {
 }
 
 print(minutes_list_nostopwords[["2020_txt_1_nostopwords"]])
+
+################################
+#SENTIMENT ANALYSIS
+################################
+
 
 
 
