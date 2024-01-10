@@ -2,6 +2,9 @@ rm(list = ls())
 library(pdftools)
 library(stringr)
 library(tm)
+library(sentimentr)
+library(ggplot2)
+
 
 ################################
 #IMPORTING AND PROCESSING
@@ -33,7 +36,7 @@ for (year in years) {
     pdf_text <- gsub("\\s+", " ", pdf_text)  # Remove multiple spaces
     pdf_text <- paste(pdf_text, collapse = " ")
     pdf_text <- substr(pdf_text, 100, nchar(pdf_text))
-
+    
     # Conditionally remove the footer-like content
     pdf_text <- gsub("Page \\d+ of \\d+\\s+\\w+ \\d+, \\d+ Chair Powell’s Press Conference FINAL", "", pdf_text)
     pdf_text <- gsub("Page \\d+ of \\d+", "", pdf_text)
@@ -163,6 +166,56 @@ print(minutes_list_nostopwords[["2020_txt_1_nostopwords"]])
 ################################
 #SENTIMENT ANALYSIS
 ################################
+
+
+# Function to calculate sentiment scores sentence by sentence
+calculate_sentiment_by_sentence <- function(text_list) {
+  scores <- list()
+  for (name in names(text_list)) {
+    text <- text_list[[name]]
+    sentiment_score <- sentiment_by(text, by = "sentence")
+    scores[[name]] <- sentiment_score
+  }
+  return(scores)
+}
+
+# Calculate sentiment by sentence for each data structure
+transcripts_sentiment_by_sentence <- calculate_sentiment_by_sentence(transcripts_list)
+statements_sentiment_by_sentence <- calculate_sentiment_by_sentence(statements_list)
+q_and_a_sentiment_by_sentence <- calculate_sentiment_by_sentence(q_and_a_list)
+minutes_sentiment_by_sentence <- calculate_sentiment_by_sentence(minutes_list)
+
+
+# Function to calculate overall sentiment scores for entire text
+calculate_sentiment_overall <- function(text_list) {
+  scores <- list()
+  for (name in names(text_list)) {
+    text <- text_list[[name]]
+    sentiment_score <- sentiment(text)
+    scores[[name]] <- sentiment_score
+  }
+  return(scores)
+}
+
+# Calculate overall sentiment overall for each data structure
+transcripts_sentiment_overall <- calculate_sentiment_overall(transcripts_list)
+statements_sentiment_overall <- calculate_sentiment_overall(statements_list)
+q_and_a_sentiment_overall <- calculate_sentiment_overall(q_and_a_list)
+minutes_sentiment_overall <- calculate_sentiment_overall(minutes_list)
+
+head(transcripts_sentiment_overall["2023_pdf_8"])
+head(transcripts_sentiment_by_sentence)
+
+
+transcripts_sentiment_overall_scores <- lapply(transcripts_sentiment_by_sentence, function(x) x$ave_sentiment)
+print(transcripts_sentiment_overall_scores)
+
+
+sentiment_scores <- unlist(transcripts_sentiment_overall_scores)
+plot(sentiment_scores, type = "o", xlab = "Texts", ylab = "Sentiment Score", main = "Sentiment Scores Across Texts")
+axis(1, at = 1:length(sentiment_scores))
+
+
 
 
 
