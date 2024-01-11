@@ -14,6 +14,8 @@ library(ggplot2)
 transcripts_directory <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/transcripts"
 minutes_directory <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/minutes/txt"
 years <- c("2020", "2021", "2022", "2023")
+press_dates <- c("2020-01-29", "2020-03-03", "2020-03-15", "2020-04-29", "2020-06-10", "2020-07-29", "2020-09-16", "2020-11-05", "2020-12-16", "2021-01-27", "2021-03-17", "2021-04-28", "2021-06-16", "2021-07-28", "2021-09-22", "2021-11-03", "2021-12-15", "2022-01-26", "2022-03-16", "2022-04-27", "2022-06-15", "2022-07-27", "2022-09-21", "2022-11-02", "2022-12-14", "2023-01-25", "2023-03-15", "2023-04-26", "2023-06-14", "2023-07-26", "2023-09-20", "2023-11-01", "2023-12-13")
+print(press_dates)
 
 # List to store text from each file
 transcripts_list <- list()
@@ -206,14 +208,68 @@ minutes_sentiment_overall <- calculate_sentiment_overall(minutes_list)
 head(transcripts_sentiment_overall["2023_pdf_8"])
 head(transcripts_sentiment_by_sentence)
 
+# Create a new data frame with the desired format for each meeting
+years <- substr(names(sentiment_scores), 1, 4)
+months <- substr(names(sentiment_scores), 6, 7)
+transcripts_sentiment <- data.frame(
+  DATE = as.Date(paste0(press_dates, "-01")),
+  Sentiment_Score = as.numeric(sentiment_scores),
+  stringsAsFactors = FALSE
+)
+print(transcripts_sentiment)
 
-transcripts_sentiment_overall_scores <- lapply(transcripts_sentiment_by_sentence, function(x) x$ave_sentiment)
-print(transcripts_sentiment_overall_scores)
+# Plotting sentiment evolution meeting by meeting 
+colors <- colorRampPalette(c("red", "yellow", "green"))(length(transcripts_sentiment$Sentiment_Score))
+color_index <- findInterval(transcripts_sentiment$Sentiment_Score, sort(unique(transcripts_sentiment$Sentiment_Score)))
+
+plot(transcripts_sentiment$DATE, transcripts_sentiment$Sentiment_Score, type = "n", xlab = "Date", ylab = "Sentiment Score", main = "Sentiment Scores Across Meetings")
+lines(transcripts_sentiment$DATE, transcripts_sentiment$Sentiment_Score, type = "o", col = "black", pch = 16, cex = 0.1)
+points(transcripts_sentiment$DATE, transcripts_sentiment$Sentiment_Score, col = colors[color_index], pch = 16, cex = 1.5)
+
+################################
+# PLOTTING INFLATION AND INFLATION EXPECTATIONS
+################################
+
+# CPI
+file_path <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/pce & cpi/CPIAUCSL.csv"
+cpi <- read.csv(file_path)
+print(cpi)
+cpi$DATE <- as.Date(cpi$DATE)
+plot(cpi$DATE, cpi$CPIAUCSL_PC1, type = "l", col = "orchid1", lwd = 2, xlab = "Date", ylab = "CPI Percent Change from a Year ago", main = "CPI from 2020 through 2023")
+
+#PCE
+file_path <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/pce & cpi/PCEPILFE.csv"
+pce <- read.csv(file_path)
+pce$DATE <- as.Date(pce$DATE)
+plot(pce$DATE, pce$PCEPILFE_PC1, type = "l", col = "mediumpurple4", lwd = 2, xlab = "Date", ylab = "Percent Change from a Year ago", main = "Core PCE from 2020 through 2023")
+
+#Together (CPI & Core PCE)
+plot(cpi$DATE, cpi$CPIAUCSL_PC1, type = "l", col = "orchid1", lwd = 2, xlab = "Date", ylab = "Percent Change from a Year ago", main = "CPI and Core PCE from 2020 through 2023")
+lines(pce$DATE, pce$PCEPILFE_PC1, col = "mediumpurple4", lwd = 2)
+legend("topright", legend = c("CPI", "Core PCE"), col = c("orchid1", "mediumpurple4"), lwd = 2)
 
 
-sentiment_scores <- unlist(transcripts_sentiment_overall_scores)
-plot(sentiment_scores, type = "o", xlab = "Texts", ylab = "Sentiment Score", main = "Sentiment Scores Across Texts")
-axis(1, at = 1:length(sentiment_scores))
+#Inflation Expectations (2 Year and 10 Year)
+file_path_2y <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/inflation expectations/EXPINF2YR.csv"
+file_path_10y <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/inflation expectations/EXPINF10YR.csv"
+
+ie2y <- read.csv(file_path_2y)
+ie10y <- read.csv(file_path_10y)
+
+ie2y$DATE <- as.Date(ie2y$DATE)
+ie10y$DATE <- as.Date(ie10y$DATE)
+
+plot(ie2y$DATE, ie2y$EXPINF2YR, type = "l", col = "lightskyblue", lwd = 2, xlab = "Date", ylab = "Percent", main = "2 Year and 10 Year Inflation Expectations")
+lines(ie10y$DATE, ie10y$EXPINF10YR, col = "mediumblue", lwd = 2)
+
+
+#All Together (Inflation and Expectations)
+plot(cpi$DATE, cpi$CPIAUCSL_PC1, type = "l", col = "orchid1", lwd = 2, xlab = "Date", ylab = "Percent", main = "Inflation & Inflation Expectations")
+lines(pce$DATE, pce$PCEPILFE_PC1, col = "mediumpurple4", lwd = 2)
+lines(ie10y$DATE, ie10y$EXPINF10YR, col = "mediumblue", lwd = 2)
+lines(ie2y$DATE, ie2y$EXPINF2YR, col = "lightskyblue", lwd = 2)
+
+legend("topright", legend = c("CPI", "Core PCE", "2Y Expectations", "10Y Expectations"), col = c("orchid1", "mediumpurple4", "lightskyblue", "mediumblue"), lwd = 4)
 
 
 
