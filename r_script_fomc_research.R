@@ -14,7 +14,8 @@ library(ggplot2)
 transcripts_directory <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/transcripts"
 minutes_directory <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/minutes/txt"
 years <- c("2020", "2021", "2022", "2023")
-press_dates <- c("2020-01-29", "2020-03-03", "2020-03-15", "2020-04-29", "2020-06-10", "2020-07-29", "2020-09-16", "2020-11-05", "2020-12-16", "2021-01-27", "2021-03-17", "2021-04-28", "2021-06-16", "2021-07-28", "2021-09-22", "2021-11-03", "2021-12-15", "2022-01-26", "2022-03-16", "2022-04-27", "2022-06-15", "2022-07-27", "2022-09-21", "2022-11-02", "2022-12-14", "2023-01-25", "2023-03-15", "2023-04-26", "2023-06-14", "2023-07-26", "2023-09-20", "2023-11-01", "2023-12-13")
+press_dates <- c("2020-01-29", "2020-03-03", "2020-03-15", "2020-04-29", "2020-06-10", "2020-07-29", "2020-09-16", "2020-11-05", "2020-12-16", "2021-01-27", "2021-03-17", "2021-04-28", "2021-06-16", "2021-07-28", "2021-09-22", "2021-11-03", "2021-12-15", "2022-01-26", "2022-03-16", "2022-05-04", "2022-06-15", "2022-07-27", "2022-09-21", "2022-11-02", "2022-12-14", "2023-02-01", "2023-03-22", "2023-05-03", "2023-06-14", "2023-07-26", "2023-09-20", "2023-11-01", "2023-12-13")
+minutes_dates <- c("2020-02-19", "2020-04-08", "2020-05-20", "2020-07-01", "2020-08-19", "2020-10-07", "2020-11-25", "2021-01-06", "2021-02-17", "2021-04-07", "2021-05-19", "2021-07-07", "2021-08-18", "2021-10-13", "2021-11-24", "2022-01-05", "2022-02-16", "2022-04-06", "2022-05-25", "2022-07-06", "2022-08-17", "2022-10-12", "2022-11-23", "2023-01-04", "2023-02-22", "2023-04-12", "2023-05-24", "2023-07-05", "2023-08-16", "2023-10-11", "2023-11-22", "2024-01-03")
 print(press_dates)
 
 # List to store text from each file
@@ -162,7 +163,6 @@ for (key in names(minutes_list)) {
   # Store processed text in new list
   minutes_list_nostopwords[[paste0(key, "_nostopwords")]] <- processed_text
 }
-
 print(minutes_list_nostopwords[["2020_txt_1_nostopwords"]])
 
 ################################
@@ -170,53 +170,66 @@ print(minutes_list_nostopwords[["2020_txt_1_nostopwords"]])
 ################################
 
 
-# Function to calculate sentiment scores sentence by sentence
-calculate_sentiment_by_sentence <- function(text_list) {
+# Function to calculate sentiment
+calculate_sentiment <- function(text_list) {
   scores <- list()
   for (name in names(text_list)) {
     text <- text_list[[name]]
     sentiment_score <- sentiment_by(text, by = "sentence")
+    #sentiment_score <- sentiment(text)
     scores[[name]] <- sentiment_score
   }
   return(scores)
 }
 
 # Calculate sentiment by sentence for each data structure
-transcripts_sentiment_by_sentence <- calculate_sentiment_by_sentence(transcripts_list)
-statements_sentiment_by_sentence <- calculate_sentiment_by_sentence(statements_list)
-q_and_a_sentiment_by_sentence <- calculate_sentiment_by_sentence(q_and_a_list)
-minutes_sentiment_by_sentence <- calculate_sentiment_by_sentence(minutes_list)
+transcripts_sentiment <- calculate_sentiment(transcripts_list)
+statements_sentiment <- calculate_sentiment(statements_list)
+q_and_a_sentiment <- calculate_sentiment(q_and_a_list)
+minutes_sentiment <- calculate_sentiment(minutes_list)
 
+transcripts_sentiment_scores <- sapply(transcripts_sentiment, function(x) x$ave_sentiment)
+statements_sentiment_scores <- sapply(statements_sentiment, function(x) x$ave_sentiment)
+q_and_a_sentiment_scores <- sapply(q_and_a_sentiment, function(x) x$ave_sentiment)
+minutes_sentiment_scores <- sapply(minutes_sentiment, function(x) x$ave_sentiment)
 
-# Function to calculate overall sentiment scores for entire text
-calculate_sentiment_overall <- function(text_list) {
-  scores <- list()
-  for (name in names(text_list)) {
-    text <- text_list[[name]]
-    sentiment_score <- sentiment(text)
-    scores[[name]] <- sentiment_score
-  }
-  return(scores)
-}
-
-# Calculate overall sentiment overall for each data structure
-transcripts_sentiment_overall <- calculate_sentiment_overall(transcripts_list)
-statements_sentiment_overall <- calculate_sentiment_overall(statements_list)
-q_and_a_sentiment_overall <- calculate_sentiment_overall(q_and_a_list)
-minutes_sentiment_overall <- calculate_sentiment_overall(minutes_list)
-
-head(transcripts_sentiment_overall["2023_pdf_8"])
-head(transcripts_sentiment_by_sentence)
-
-# Create a new data frame with the desired format for each meeting
-years <- substr(names(sentiment_scores), 1, 4)
-months <- substr(names(sentiment_scores), 6, 7)
+# Create new data frames with the desired format 
+# Transcripts
 transcripts_sentiment <- data.frame(
   DATE = as.Date(paste0(press_dates, "-01")),
-  Sentiment_Score = as.numeric(sentiment_scores),
-  stringsAsFactors = FALSE
+  Sentiment_Score = transcripts_sentiment_scores,
+  stringsAsFactors = FALSE,
+  row.names = NULL
 )
 print(transcripts_sentiment)
+# Statements
+statements_sentiment <- data.frame(
+  DATE = as.Date(paste0(press_dates, "-01")),
+  Sentiment_Score = statements_sentiment_scores,
+  stringsAsFactors = FALSE,
+  row.names = NULL
+)
+print(statements_sentiment)
+# Q&As
+q_and_a_sentiment <- data.frame(
+  DATE = as.Date(paste0(press_dates, "-01")),
+  Sentiment_Score = q_and_a_sentiment_scores,
+  stringsAsFactors = FALSE,
+  row.names = NULL
+)
+print(q_and_a_sentiment)
+# Minutes
+minutes_sentiment <- data.frame(
+  DATE = as.Date(paste0(minutes_dates, "-01")),
+  Sentiment_Score = minutes_sentiment_scores,
+  stringsAsFactors = FALSE,
+  row.names = NULL
+)
+# The third meeting of 2020 was an emergency one, hence why the second minutes should apply meetings 2 and 3 of 2020
+new_row <- minutes_sentiment[2, ]
+minutes_sentiment <- rbind(minutes_sentiment[1:2, ], new_row, minutes_sentiment[3:nrow(minutes_sentiment), ])
+rownames(minutes_sentiment) <- NULL
+print(minutes_sentiment)
 
 # Plotting sentiment evolution meeting by meeting 
 colors <- colorRampPalette(c("red", "yellow", "green"))(length(transcripts_sentiment$Sentiment_Score))
@@ -225,6 +238,67 @@ color_index <- findInterval(transcripts_sentiment$Sentiment_Score, sort(unique(t
 plot(transcripts_sentiment$DATE, transcripts_sentiment$Sentiment_Score, type = "n", xlab = "Date", ylab = "Sentiment Score", main = "Sentiment Scores Across Meetings")
 lines(transcripts_sentiment$DATE, transcripts_sentiment$Sentiment_Score, type = "o", col = "black", pch = 16, cex = 0.1)
 points(transcripts_sentiment$DATE, transcripts_sentiment$Sentiment_Score, col = colors[color_index], pch = 16, cex = 1.5)
+
+# Plotting statement vs Q&A
+
+# Difference
+merged_data <- merge(statements_sentiment, q_and_a_sentiment, by = "DATE", suffixes = c("_statements", "_q_and_a"))
+merged_data$DATE <- as.Date(merged_data$DATE)
+merged_data$Sentiment_Difference <- merged_data$Sentiment_Score_q_and_a - merged_data$Sentiment_Score_statements
+merged_data$Sentiment_Difference <- as.numeric(merged_data$Sentiment_Difference)
+
+ggplot(merged_data, aes(x = DATE, y = Sentiment_Difference, color = Sentiment_Difference)) +
+  geom_point(size = 4, shape = 18) +
+  geom_line(linetype = "twodash", color = "wheat2") +
+  scale_color_gradient(low = "red1", high = "springgreen", name = "Difference") +
+  labs(title = "Scope of Difference in Sentiment between Q&A and Statements",
+       x = "Date",
+       y = "Sentiment Difference") +
+  theme_minimal()
+
+# Scope
+statements_sentiment$ID <- seq_along(statements_sentiment$DATE)
+q_and_a_sentiment$ID <- seq_along(q_and_a_sentiment$DATE)
+q_and_a_sentiment$DifferentPoints <- FALSE 
+selected_indices <- c(2, 3, 4, 5, 6, 7, 19, 20, 29, 30, 32)
+q_and_a_sentiment$DifferentPoints[selected_indices] <- TRUE
+
+combined_plot <- ggplot() +
+  geom_point(data = statements_sentiment, aes(x = DATE, y = Sentiment_Score, color = "midnightblue"), shape = 18, size = 2) +
+  geom_point(data = q_and_a_sentiment, aes(x = DATE, y = Sentiment_Score, color = DifferentPoints, fill = DifferentPoints), 
+             shape = ifelse(q_and_a_sentiment$DifferentPoints, 24, 25),
+             size = ifelse(q_and_a_sentiment$DifferentPoints, 3, 3)) +
+  geom_segment(data = merge(statements_sentiment, q_and_a_sentiment, by = "ID"),
+               aes(x = DATE.x, xend = DATE.y, y = Sentiment_Score.x, yend = Sentiment_Score.y),
+               linetype = "dashed", color = "gray") +
+  labs(title = "Sentiment Difference between Q&A compared to the Statement",
+       x = "Date",
+       y = "Sentiment Score") +
+  scale_color_manual(values = c("TRUE" = "olivedrab2", "FALSE" = "tomato1"), guide = FALSE) + 
+  theme_minimal()
+print(combined_plot)
+
+# Plotting statement vs minutes
+statements_sentiment$ID <- seq_along(statements_sentiment$DATE)
+minutes_sentiment$ID <- seq_along(minutes_sentiment$DATE)
+minutes_sentiment$DifferentPoints <- FALSE 
+selected_indices <- c(6, 17, 19, 20, 21, 22, 26, 30, 32)
+minutes_sentiment$DifferentPoints[selected_indices] <- TRUE
+
+combined_plot <- ggplot() +
+  geom_point(data = statements_sentiment, aes(x = DATE, y = Sentiment_Score, color = "midnightblue"), shape = 18, size = 2) +
+  geom_point(data = minutes_sentiment, aes(x = DATE, y = Sentiment_Score, color = DifferentPoints, fill = DifferentPoints), 
+             shape = ifelse(minutes_sentiment$DifferentPoints, 24, 25),
+             size = ifelse(minutes_sentiment$DifferentPoints, 3, 3)) +
+  geom_segment(data = merge(statements_sentiment, minutes_sentiment, by = "ID"),
+               aes(x = DATE.x, xend = DATE.y, y = Sentiment_Score.x, yend = Sentiment_Score.y),
+               linetype = "twodash", color = "snow4") +
+  labs(title = "Sentiment Difference between Statement and Minutes",
+       x = "Date",
+       y = "Sentiment Score") +
+  scale_color_manual(values = c("TRUE" = "springgreen1", "FALSE" = "tomato3"), guide = FALSE) + 
+  theme_minimal()
+print(combined_plot)
 
 ################################
 # PLOTTING INFLATION AND INFLATION EXPECTATIONS
@@ -270,7 +344,6 @@ lines(ie10y$DATE, ie10y$EXPINF10YR, col = "mediumblue", lwd = 2)
 lines(ie2y$DATE, ie2y$EXPINF2YR, col = "lightskyblue", lwd = 2)
 
 legend("topright", legend = c("CPI", "Core PCE", "2Y Expectations", "10Y Expectations"), col = c("orchid1", "mediumpurple4", "lightskyblue", "mediumblue"), lwd = 4)
-
 
 
 
