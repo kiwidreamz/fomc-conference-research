@@ -260,7 +260,7 @@ ggplot(merged_data, aes(x = DATE, y = Sentiment_Difference, color = Sentiment_Di
 statements_sentiment$ID <- seq_along(statements_sentiment$DATE)
 q_and_a_sentiment$ID <- seq_along(q_and_a_sentiment$DATE)
 q_and_a_sentiment$DifferentPoints <- FALSE 
-selected_indices <- c(2, 3, 4, 5, 6, 7, 19, 20, 29, 30, 32)
+selected_indices <- c(2, 3, 4, 5, 6, 7, 19, 20, 29, 30, 32) # manually input positive difference for graphical purposes
 q_and_a_sentiment$DifferentPoints[selected_indices] <- TRUE
 
 combined_plot <- ggplot() +
@@ -278,27 +278,44 @@ combined_plot <- ggplot() +
   theme_minimal()
 print(combined_plot)
 
-# Plotting statement vs minutes
-statements_sentiment$ID <- seq_along(statements_sentiment$DATE)
+# Plotting meetings vs minutes
+transcripts_sentiment$ID <- seq_along(transcripts_sentiment$DATE)
 minutes_sentiment$ID <- seq_along(minutes_sentiment$DATE)
 minutes_sentiment$DifferentPoints <- FALSE 
-selected_indices <- c(6, 17, 19, 20, 21, 22, 26, 30, 32)
+selected_indices <- c(10, 11, 13, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26, 30) # manually input positive difference for graphical purposes
 minutes_sentiment$DifferentPoints[selected_indices] <- TRUE
 
 combined_plot <- ggplot() +
-  geom_point(data = statements_sentiment, aes(x = DATE, y = Sentiment_Score, color = "midnightblue"), shape = 18, size = 2) +
+  geom_point(data = transcripts_sentiment, aes(x = DATE, y = Sentiment_Score, color = "midnightblue"), shape = 18, size = 2) +
   geom_point(data = minutes_sentiment, aes(x = DATE, y = Sentiment_Score, color = DifferentPoints, fill = DifferentPoints), 
              shape = ifelse(minutes_sentiment$DifferentPoints, 24, 25),
              size = ifelse(minutes_sentiment$DifferentPoints, 3, 3)) +
-  geom_segment(data = merge(statements_sentiment, minutes_sentiment, by = "ID"),
+  geom_segment(data = merge(transcripts_sentiment, minutes_sentiment, by = "ID"),
                aes(x = DATE.x, xend = DATE.y, y = Sentiment_Score.x, yend = Sentiment_Score.y),
                linetype = "twodash", color = "snow4") +
-  labs(title = "Sentiment Difference between Statement and Minutes",
+  labs(title = "Sentiment Difference between Transcripts and Minutes",
        x = "Date",
        y = "Sentiment Score") +
   scale_color_manual(values = c("TRUE" = "springgreen1", "FALSE" = "tomato3"), guide = FALSE) + 
   theme_minimal()
 print(combined_plot)
+
+# Difference
+transcripts_sentiment$ID <- seq_along(transcripts_sentiment$DATE)
+minutes_sentiment$ID <- seq_along(minutes_sentiment$DATE)
+merged_data2 <- merge(transcripts_sentiment, minutes_sentiment, by = "ID", suffixes = c("_transcripts", "_minutes"))
+#merged_data2$DATE <- as.Date(merged_data2$DATE)
+merged_data2$Sentiment_Difference <- merged_data2$Sentiment_Score_transcripts - merged_data2$Sentiment_Score_minutes
+merged_data2$Sentiment_Difference <- as.numeric(merged_data2$Sentiment_Difference)
+
+ggplot(merged_data2, aes(x = transcripts_sentiment$DATE, y = Sentiment_Difference, color = Sentiment_Difference)) +
+  geom_point(size = 4, shape = 18) +
+  geom_line(linetype = "twodash", color = "wheat2") +
+  scale_color_gradient(low = "red1", high = "springgreen", name = "Difference") +
+  labs(title = "Scope of Difference in Sentiment between Transcripts and Minutes",
+       x = "Date",
+       y = "Sentiment Difference") +
+  theme_minimal()
 
 ################################
 # PLOTTING INFLATION AND INFLATION EXPECTATIONS
@@ -346,6 +363,64 @@ lines(ie2y$DATE, ie2y$EXPINF2YR, col = "lightskyblue", lwd = 2)
 legend("topright", legend = c("CPI", "Core PCE", "2Y Expectations", "10Y Expectations"), col = c("orchid1", "mediumpurple4", "lightskyblue", "mediumblue"), lwd = 4)
 
 
+################################
+# PLOTTING FED FUNDS RATES
+################################
+
+file_path <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/interest rates/FEDFUNDS.csv"
+fed_funds_rate <- read.csv(file_path)
+fed_funds_rate$DATE <- as.Date(fed_funds_rate$DATE)
+plot(fed_funds_rate$DATE, fed_funds_rate$FEDFUNDS, type = "l", col = "royalblue", lwd = 3, xlab = "Date", ylab = "Percent", main = "Fed Funds Effective Rate")
 
 
+
+
+################################
+# CALCULATING CORRELATION
+################################
+
+
+new_entry <- data.frame(DATE = "2023-12", PCEPILFE_PC1 = 3.08504) # adding latest figure which wasn't available when i downloaded the pce figures
+pce_corr <- rbind(pce, new_entry)
+
+
+transcripts_sentiment_corr
+
+cpi
+pce
+ie2y
+ie10y
+fed_funds_rate
+
+# Convert DATE columns to Date class
+transcripts_sentiment_corr <- transcripts_sentiment
+transcripts_sentiment_corr$DATE <- format(transcripts_sentiment_corr$DATE, "%Y-%m")
+cpi$DATE <- format(cpi$DATE, "%Y-%m")
+pce_corr$DATE <- format(pce_corr$DATE, "%Y-%m")
+ie2y$DATE <- format(ie2y$DATE, "%Y-%m")
+ie10y$DATE <- format(ie10y$DATE, "%Y-%m")
+fed_funds_rate$DATE <- format(fed_funds_rate$DATE, "%Y-%m")
+
+# Merge data structures based on the DATE column
+merged_data <- merge(transcripts_sentiment_m, cpi, by = "DATE", all.x = TRUE)
+merged_data <- merge(merged_data, pce_corr, by = "DATE", all.x = TRUE)
+merged_data <- merge(merged_data, ie2y, by = "DATE", all.x = TRUE)
+merged_data <- merge(merged_data, ie10y, by = "DATE", all.x = TRUE)
+merged_data <- merge(merged_data, fed_funds_rate, by = "DATE", all.x = TRUE)
+dim(merged_data)
+
+# Calculate correlation
+cor_cpi <- cor(merged_data$Sentiment_Score, merged_data$CPIAUCSL_PC1)
+cor_pce <- cor(merged_data$Sentiment_Score, merged_data$PCEPILFE_PC1)
+cor_ie2y <- cor(merged_data$Sentiment_Score, merged_data$EXPINF2YR)
+cor_ie10y <- cor(merged_data$Sentiment_Score, merged_data$EXPINF10YR)
+cor_fed_funds <- cor(merged_data$Sentiment_Score, merged_data$FEDFUNDS)
+
+cat( "\n",
+  "Transcript Sentiment Correlation with CPI:", cor_cpi, "\n",
+  "Transcript Sentiment Correlation with Core PCE:", cor_pce, "\n",
+  "Transcript Sentiment Correlation with 2 Year Inflation Expectations:", cor_ie2y, "\n",
+  "Transcript Sentiment Correlation with 10 Year Inflation Expectations:", cor_ie10y, "\n",
+  "Transcript Sentiment Correlation with Fed Funds Rate:", cor_fed_funds, "\n"
+)
 
