@@ -373,8 +373,6 @@ fed_funds_rate$DATE <- as.Date(fed_funds_rate$DATE)
 plot(fed_funds_rate$DATE, fed_funds_rate$FEDFUNDS, type = "l", col = "royalblue", lwd = 3, xlab = "Date", ylab = "Percent", main = "Fed Funds Effective Rate")
 
 
-
-
 ################################
 # CALCULATING CORRELATION
 ################################
