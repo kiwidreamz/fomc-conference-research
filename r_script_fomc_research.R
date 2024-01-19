@@ -378,7 +378,7 @@ plot(fed_funds_rate$DATE, fed_funds_rate$FEDFUNDS, type = "l", col = "royalblue"
 ################################
 
 
-new_entry <- data.frame(DATE = "2023-12", PCEPILFE_PC1 = 3.08504) # adding latest figure which wasn't available when i downloaded the pce figures
+new_entry <- data.frame(DATE = "2023-12-01", PCEPILFE_PC1 = 3.08504) # adding latest figure which wasn't available when i downloaded the pce figures
 pce_corr <- rbind(pce, new_entry)
 
 
@@ -400,7 +400,7 @@ ie10y$DATE <- format(ie10y$DATE, "%Y-%m")
 fed_funds_rate$DATE <- format(fed_funds_rate$DATE, "%Y-%m")
 
 # Merge data structures based on the DATE column
-merged_data <- merge(transcripts_sentiment_m, cpi, by = "DATE", all.x = TRUE)
+merged_data <- merge(transcripts_sentiment_corr, cpi, by = "DATE", all.x = TRUE)
 merged_data <- merge(merged_data, pce_corr, by = "DATE", all.x = TRUE)
 merged_data <- merge(merged_data, ie2y, by = "DATE", all.x = TRUE)
 merged_data <- merge(merged_data, ie10y, by = "DATE", all.x = TRUE)
@@ -422,3 +422,42 @@ cat( "\n",
   "Transcript Sentiment Correlation with Fed Funds Rate:", cor_fed_funds, "\n"
 )
 
+
+################################
+# WORD FREQUENCY
+################################
+
+names(transcripts_list) <- press_dates
+names(minutes_list) <- minutes_dates
+transcripts_data <- data.frame(DATE = as.Date(names(transcripts_list), format = "%Y-%m-%d"), TEXT = unlist(transcripts_list), stringsAsFactors = FALSE)
+minutes_data <- data.frame(DATE = as.Date(names(minutes_list), format = "%Y-%m-%d"), TEXT = unlist(minutes_list), stringsAsFactors = FALSE)
+
+
+# Function to count word occurance through transcripts and minutes
+count_word_appearances <- function(transcripts_data, minutes_data, target_word) {
+  transcripts_data$DATE <- as.Date(transcripts_data$DATE)
+  minutes_data$DATE <- as.Date(minutes_data$DATE)
+  combined_data <- rbind(transcripts_data, minutes_data)
+  
+  word_counts <- data.frame(DATE = unique(combined_data$DATE), Transcripts_Appearances = 0, Minutes_Appearances = 0)
+  
+  # Looping through each date and counting word appearances
+  for (i in seq_along(word_counts$DATE)) {
+    current_date <- word_counts$DATE[i]
+    
+    transcripts_text <- transcripts_data[names(transcripts_data) == as.character(current_date), "TEXT"]
+    transcripts_text <- paste(transcripts_text, collapse = " ")
+    
+    minutes_text <- minutes_data[names(minutes_data) == as.character(current_date), "TEXT"]
+    minutes_text <- paste(minutes_text, collapse = " ")
+    
+    word_counts$Transcripts_Appearances[i] <- sum(str_count(tolower(transcripts_text), target_word))
+    word_counts$Minutes_Appearances[i] <- sum(str_count(tolower(minutes_text), target_word))
+  }
+  word_counts <- word_counts[order(word_counts$DATE), ]
+  
+  return(word_counts)
+}
+
+# Get appearances by word
+inflation_counts <- count_word_appearances(transcripts_data, minutes_data, "inflation")
