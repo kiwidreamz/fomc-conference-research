@@ -433,31 +433,44 @@ transcripts_data <- data.frame(DATE = as.Date(names(transcripts_list), format = 
 minutes_data <- data.frame(DATE = as.Date(names(minutes_list), format = "%Y-%m-%d"), TEXT = unlist(minutes_list), stringsAsFactors = FALSE)
 
 
-# Function to count word occurance through transcripts and minutes
+# Function to count word occurrence through transcripts and minutes
 count_word_appearances <- function(transcripts_data, minutes_data, target_word) {
   transcripts_data$DATE <- as.Date(transcripts_data$DATE)
   minutes_data$DATE <- as.Date(minutes_data$DATE)
+  
   combined_data <- rbind(transcripts_data, minutes_data)
+  unique_dates <- unique(combined_data$DATE)
   
   word_counts <- data.frame(DATE = unique(combined_data$DATE), Transcripts_Appearances = 0, Minutes_Appearances = 0)
   
   # Looping through each date and counting word appearances
-  for (i in seq_along(word_counts$DATE)) {
-    current_date <- word_counts$DATE[i]
+  for (i in seq_along(unique_dates)) {
+    current_date <- unique_dates[i]
     
-    transcripts_text <- transcripts_data[names(transcripts_data) == as.character(current_date), "TEXT"]
+    transcripts_text <- transcripts_data[transcripts_data$DATE == current_date, "TEXT"]
     transcripts_text <- paste(transcripts_text, collapse = " ")
     
-    minutes_text <- minutes_data[names(minutes_data) == as.character(current_date), "TEXT"]
+    minutes_text <- minutes_data[minutes_data$DATE == current_date, "TEXT"]
     minutes_text <- paste(minutes_text, collapse = " ")
     
     word_counts$Transcripts_Appearances[i] <- sum(str_count(tolower(transcripts_text), target_word))
     word_counts$Minutes_Appearances[i] <- sum(str_count(tolower(minutes_text), target_word))
   }
-  word_counts <- word_counts[order(word_counts$DATE), ]
   
   return(word_counts)
 }
 
-# Get appearances by word
+# Get appearances by word [Inflation]
 inflation_counts <- count_word_appearances(transcripts_data, minutes_data, "inflation")
+transcripts_counts <- inflation_counts[1:33, ]
+minutes_counts <- inflation_counts[34:nrow(inflation_counts), ]
+
+# Time series plot
+ggplot(transcripts_counts, aes(x = DATE)) +
+  geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
+  geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
+  labs(title = "Inflation Word Appearances Over Time",
+       x = "Date",
+       y = "Word Count") +
+  scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
+  theme_minimal()
