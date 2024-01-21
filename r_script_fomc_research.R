@@ -460,16 +460,36 @@ count_word_appearances <- function(transcripts_data, minutes_data, target_word) 
   return(word_counts)
 }
 
-# Get appearances by word [Inflation]
+# Get counts for inflation
 inflation_counts <- count_word_appearances(transcripts_data, minutes_data, "inflation")
 transcripts_counts <- inflation_counts[1:33, ]
 minutes_counts <- inflation_counts[34:nrow(inflation_counts), ]
 
-# Time series plot
+# Get counts for disinflation
+disinflation_counts <- count_word_appearances(transcripts_data, minutes_data, "disinflation")
+transcripts_counts <- disinflation_counts[1:33, ]
+minutes_counts <- disinflation_counts[34:nrow(disinflation_counts), ]
+
+# Get counts for deflation
+deflation_counts <- count_word_appearances(transcripts_data, minutes_data, "deflation")
+transcripts_counts <- deflation_counts[1:33, ]
+minutes_counts <- deflation_counts[34:nrow(deflation_counts), ]
+
+# Get counts for inflation expectations
+inflation_expectations_counts <- count_word_appearances(transcripts_data, minutes_data, "inflation expectations")
+transcripts_counts <- inflation_expectations_counts[1:33, ]
+minutes_counts <- inflation_expectations_counts[34:nrow(inflation_expectations_counts), ]
+
+# Get counts for unemployment
+unemployment_counts <- count_word_appearances(transcripts_data, minutes_data, "unemployment")
+transcripts_counts <- unemployment_counts[1:33, ]
+minutes_counts <- unemployment_counts[34:nrow(unemployment_counts), ]
+
+# Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = "Inflation Word Appearances Over Time",
+  labs(title = 'Word Frequency Over Time - "deflation"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
