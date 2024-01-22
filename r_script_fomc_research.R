@@ -485,11 +485,86 @@ unemployment_counts <- count_word_appearances(transcripts_data, minutes_data, "u
 transcripts_counts <- unemployment_counts[1:33, ]
 minutes_counts <- unemployment_counts[34:nrow(unemployment_counts), ]
 
+# Get counts for stimulus
+stimulus_counts <- count_word_appearances(transcripts_data, minutes_data, "stimulus")
+transcripts_counts <- stimulus_counts[1:33, ]
+minutes_counts <- stimulus_counts[34:nrow(stimulus_counts), ]
+
+# Get counts for quantitative easing
+qe_counts <- count_word_appearances(transcripts_data, minutes_data, "quantitative easing")
+transcripts_counts <- qe_counts[1:33, ]
+minutes_counts <- qe_counts[34:nrow(qe_counts), ]
+
+# Get counts for quantitative tightening
+qt_counts <- count_word_appearances(transcripts_data, minutes_data, "quantitative tightening")
+transcripts_counts <- qt_counts[1:33, ]
+minutes_counts <- qt_counts[34:nrow(qt_counts), ]
+
+# Get counts for easing
+easing_counts <- count_word_appearances(transcripts_data, minutes_data, "easing")
+transcripts_counts <- easing_counts[1:33, ]
+minutes_counts <- easing_counts[34:nrow(easing_counts), ]
+
+# Get counts for tightening
+tightening_counts <- count_word_appearances(transcripts_data, minutes_data, "tightening")
+transcripts_counts <- tightening_counts[1:33, ]
+minutes_counts <- tightening_counts[34:nrow(tightening_counts), ]
+
+# Get counts for transitory
+transitory_counts <- count_word_appearances(transcripts_data, minutes_data, "transitory")
+transcripts_counts <- transitory_counts[1:33, ]
+minutes_counts <- transitory_counts[34:nrow(transitory_counts), ]
+
+# Get counts for tight labor market
+tlm_counts <- count_word_appearances(transcripts_data, minutes_data, "tight labor market")
+transcripts_counts <- tlm_counts[1:33, ]
+minutes_counts <- tlm_counts[34:nrow(tlm_counts), ]
+
+# Get counts for wage–price spiral
+spiral_counts <- count_word_appearances(transcripts_data, minutes_data, "wage–price spiral")
+transcripts_counts <- spiral_counts[1:33, ]
+minutes_counts <- spiral_counts[34:nrow(spiral_counts), ]
+
+# Get counts for 2 percent
+twopercent_counts <- count_word_appearances(transcripts_data, minutes_data, "2 percent")
+transcripts_counts <- twopercent_counts[1:33, ]
+minutes_counts <- twopercent_counts[34:nrow(twopercent_counts), ]
+
+# Get counts for Volcker
+volcker_counts <- count_word_appearances(transcripts_data, minutes_data, "volcker")
+transcripts_counts <- volcker_counts[1:33, ]
+minutes_counts <- volcker_counts[34:nrow(volcker_counts), ]
+
+# Get counts for higher for longer
+higher_for_longer_counts <- count_word_appearances(transcripts_data, minutes_data, "higher for longer")
+transcripts_counts <- higher_for_longer_counts[1:33, ]
+minutes_counts <- higher_for_longer_counts[34:nrow(higher_for_longer_counts), ]
+
+# Get counts for debt
+debt_counts <- count_word_appearances(transcripts_data, minutes_data, "debt")
+transcripts_counts <- debt_counts[1:33, ]
+minutes_counts <- debt_counts[34:nrow(debt_counts), ]
+
+# Get counts for lag
+lag_counts <- count_word_appearances(transcripts_data, minutes_data, "lag")
+transcripts_counts <- lag_counts[1:33, ]
+minutes_counts <- lag_counts[34:nrow(lag_counts), ]
+
+# Get counts for restrictive
+restrictive_counts <- count_word_appearances(transcripts_data, minutes_data, "restrictive")
+transcripts_counts <- restrictive_counts[1:33, ]
+minutes_counts <- restrictive_counts[34:nrow(restrictive_counts), ]
+
+# Get counts for real rate
+real_rate_counts <- count_word_appearances(transcripts_data, minutes_data, "real rate")
+transcripts_counts <- real_rate_counts[1:33, ]
+minutes_counts <- real_rate_counts[34:nrow(real_rate_counts), ]
+
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "deflation"',
+  labs(title = 'Word Frequency Over Time - "real rate"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
