@@ -551,7 +551,7 @@ transcripts_counts <- lag_counts[1:33, ]
 minutes_counts <- lag_counts[34:nrow(lag_counts), ]
 
 # Get counts for restrictive
-restrictive_counts <- count_word_appearances(transcripts_data, minutes_data, "restrictive")
+restrictive_counts <- count_word_appearances(transcripts_data, minutes_data, "sufficiently restrictive")
 transcripts_counts <- restrictive_counts[1:33, ]
 minutes_counts <- restrictive_counts[34:nrow(restrictive_counts), ]
 
@@ -560,11 +560,31 @@ real_rate_counts <- count_word_appearances(transcripts_data, minutes_data, "real
 transcripts_counts <- real_rate_counts[1:33, ]
 minutes_counts <- real_rate_counts[34:nrow(real_rate_counts), ]
 
+# Get counts for rate hike
+hike_counts <- count_word_appearances(transcripts_data, minutes_data, "hik")
+transcripts_counts <- hike_counts[1:33, ]
+minutes_counts <- hike_counts[34:nrow(hike_counts), ]
+
+# Get counts for raise rates
+raise_counts <- count_word_appearances(transcripts_data, minutes_data, "raise interest rates|raise rates")
+transcripts_counts <- raise_counts[1:33, ]
+minutes_counts <- raise_counts[34:nrow(raise_counts), ]
+
+# Get counts for rate cuts
+cut_counts <- count_word_appearances(transcripts_data, minutes_data, "cuts|rate cut|cutting")
+transcripts_counts <- cut_counts[1:33, ]
+minutes_counts <- cut_counts[34:nrow(cut_counts), ]
+
+# Get counts for flexible average
+flexible_counts <- count_word_appearances(transcripts_data, minutes_data, "flexible average")
+transcripts_counts <- flexible_counts[1:33, ]
+minutes_counts <- flexible_counts[34:nrow(flexible_counts), ]
+
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "real rate"',
+  labs(title = 'Word Frequency Over Time - "flexible average"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
