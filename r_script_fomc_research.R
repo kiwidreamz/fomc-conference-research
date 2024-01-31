@@ -581,7 +581,7 @@ transcripts_counts <- flexible_counts[1:33, ]
 minutes_counts <- flexible_counts[34:nrow(flexible_counts), ]
 
 # Get counts for bank
-bank_counts <- count_word_appearances(transcripts_data, minutes_data, "regional banks")
+bank_counts <- count_word_appearances(transcripts_data, minutes_data, "regional bank")
 transcripts_counts <- bank_counts[1:33, ]
 minutes_counts <- bank_counts[34:nrow(bank_counts), ]
 
@@ -589,7 +589,7 @@ minutes_counts <- bank_counts[34:nrow(bank_counts), ]
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "regional banks"',
+  labs(title = 'Word Frequency Over Time - "regional bank"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
