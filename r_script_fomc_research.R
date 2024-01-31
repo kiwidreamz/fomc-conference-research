@@ -516,7 +516,7 @@ transcripts_counts <- transitory_counts[1:33, ]
 minutes_counts <- transitory_counts[34:nrow(transitory_counts), ]
 
 # Get counts for tight labor market
-tlm_counts <- count_word_appearances(transcripts_data, minutes_data, "tight labor market")
+tlm_counts <- count_word_appearances(transcripts_data, minutes_data, "tight labor market|labor market remains tight")
 transcripts_counts <- tlm_counts[1:33, ]
 minutes_counts <- tlm_counts[34:nrow(tlm_counts), ]
 
@@ -585,12 +585,54 @@ bank_counts <- count_word_appearances(transcripts_data, minutes_data, "regional 
 transcripts_counts <- bank_counts[1:33, ]
 minutes_counts <- bank_counts[34:nrow(bank_counts), ]
 
+# Get counts for immigration 
+immigration_counts <- count_word_appearances(transcripts_data, minutes_data, "immigration")
+transcripts_counts <- immigration_counts[1:33, ]
+minutes_counts <- immigration_counts[34:nrow(immigration_counts), ]
+
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "regional bank"',
+  labs(title = 'Word Frequency Over Time - "immigration"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
   theme_minimal()
+
+
+################################
+# UNEMPLOYMENT
+################################
+
+# UR
+file_path <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/UNRATE.csv"
+ur <- read.csv(file_path)
+print(ur)
+ur$DATE <- as.Date(ur$DATE)
+plot(ur$DATE, ur$UNRATE, type = "l", col = "salmon1", lwd = 2, xlab = "Date", ylab = "UNRATE", main = "Unemployment Rate")
+
+# Correlation (UR vs U mentions)
+unemployment_counts
+ur
+
+ur$DATE <- format(ur$DATE, "%Y-%m")
+unemployment_counts$DATE <- format(unemployment_counts$DATE, "%Y-%m")
+unemployment_counts$COUNTS <- unemployment_counts$Transcripts_Appearances + unemployment_counts$Minutes_Appearances
+unemployment_counts <- unemployment_counts[, !(names(unemployment_counts) %in% c("Transcripts_Appearances", "Minutes_Appearances"))]
+unemployment_counts <- unemployment_counts[order(unemployment_counts$DATE), ]
+
+unique_dates <- unique(unemployment_counts$DATE)
+combined_counts <- sapply(unique_dates, function(date) {
+  sum(unemployment_counts$COUNTS[unemployment_counts$DATE == date])
+})
+combined_df <- data.frame(DATE = unique_dates, COUNTS = combined_counts)
+rownames(combined_df) <- NULL
+combined_df <- combined_df[combined_df$DATE != "2024-01", ]
+combined_df
+
+merged_unemployment <- merge(combined_df, ur, by = "DATE", all.x = TRUE)
+cor_ur <- cor(merged_unemployment$COUNTS, merged_unemployment$UNRATE)
+
+cat( "\n",
+     "Unemployment Rate Correlation with Unemployment Counts:", cor_ur, "\n")
