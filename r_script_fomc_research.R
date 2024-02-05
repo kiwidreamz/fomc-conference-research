@@ -490,16 +490,6 @@ stimulus_counts <- count_word_appearances(transcripts_data, minutes_data, "stimu
 transcripts_counts <- stimulus_counts[1:33, ]
 minutes_counts <- stimulus_counts[34:nrow(stimulus_counts), ]
 
-# Get counts for quantitative easing
-qe_counts <- count_word_appearances(transcripts_data, minutes_data, "quantitative easing")
-transcripts_counts <- qe_counts[1:33, ]
-minutes_counts <- qe_counts[34:nrow(qe_counts), ]
-
-# Get counts for quantitative tightening
-qt_counts <- count_word_appearances(transcripts_data, minutes_data, "quantitative tightening")
-transcripts_counts <- qt_counts[1:33, ]
-minutes_counts <- qt_counts[34:nrow(qt_counts), ]
-
 # Get counts for easing
 easing_counts <- count_word_appearances(transcripts_data, minutes_data, "easing")
 transcripts_counts <- easing_counts[1:33, ]
@@ -585,16 +575,22 @@ bank_counts <- count_word_appearances(transcripts_data, minutes_data, "regional 
 transcripts_counts <- bank_counts[1:33, ]
 minutes_counts <- bank_counts[34:nrow(bank_counts), ]
 
-# Get counts for immigration 
-immigration_counts <- count_word_appearances(transcripts_data, minutes_data, "immigration")
-transcripts_counts <- immigration_counts[1:33, ]
-minutes_counts <- immigration_counts[34:nrow(immigration_counts), ]
+# Get counts for taper 
+taper_counts <- count_word_appearances(transcripts_data, minutes_data, "taper")
+transcripts_counts <- taper_counts[1:33, ]
+minutes_counts <- taper_counts[34:nrow(taper_counts), ]
+
+# Get counts for rate increases 
+increase_counts <- count_word_appearances(transcripts_data, minutes_data, "rate increase")
+transcripts_counts <- increase_counts[1:33, ]
+minutes_counts <- increase_counts[34:nrow(increase_counts), ]
+
 
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "immigration"',
+  labs(title = 'Word Frequency Over Time - "rate increase"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
