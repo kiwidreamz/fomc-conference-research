@@ -632,3 +632,28 @@ cor_ur <- cor(merged_unemployment$COUNTS, merged_unemployment$UNRATE)
 
 cat( "\n",
      "Unemployment Rate Correlation with Unemployment Counts:", cor_ur, "\n")
+
+################################
+# REAL RATE
+################################
+
+# RR
+file_path <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/interest rates/REAINTRATREARAT1YE.csv"
+rr1 <- read.csv(file_path)
+file_path <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/interest rates/REAINTRATREARAT10Y.csv"
+rr10 <- read.csv(file_path)
+file_path <- "C:/Users/STEPHANE/Documents/fomc-conference-research/data/interest rates/REAINTRATREARAT1MO.csv"
+rrm <- read.csv(file_path)
+
+rr1$DATE <- as.Date(rr1$DATE)
+rr10$DATE <- as.Date(rr10$DATE)
+rrm$DATE <- as.Date(rrm$DATE)
+
+plot(rr1$DATE, rr1$REAINTRATREARAT1YE, type = "l", col = "deepskyblue3", lwd = 2, xlab = "Date", ylab = "REAINTRATREARAT", main = "Real Rates", ylim = c(-8, 8))
+lines(rr10$DATE, rr10$REAINTRATREARAT10Y, col = "forestgreen", lwd = 2)
+lines(rr10$DATE, rrm$REAINTRATREARAT1MO, col = "firebrick1", lwd = 2)
+abline(h = 0, col = "gray57", lty = 2)
+
+legend("topleft", legend = c("1-Month", "1-Year",  "10-Year"), col = c("firebrick1", "deepskyblue3", "forestgreen"), lwd = 2)
+
+
