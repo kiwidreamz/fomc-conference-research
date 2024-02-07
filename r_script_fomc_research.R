@@ -520,21 +520,6 @@ twopercent_counts <- count_word_appearances(transcripts_data, minutes_data, "2 p
 transcripts_counts <- twopercent_counts[1:33, ]
 minutes_counts <- twopercent_counts[34:nrow(twopercent_counts), ]
 
-# Get counts for Volcker
-volcker_counts <- count_word_appearances(transcripts_data, minutes_data, "volcker")
-transcripts_counts <- volcker_counts[1:33, ]
-minutes_counts <- volcker_counts[34:nrow(volcker_counts), ]
-
-# Get counts for higher for longer
-higher_for_longer_counts <- count_word_appearances(transcripts_data, minutes_data, "higher for longer")
-transcripts_counts <- higher_for_longer_counts[1:33, ]
-minutes_counts <- higher_for_longer_counts[34:nrow(higher_for_longer_counts), ]
-
-# Get counts for debt
-debt_counts <- count_word_appearances(transcripts_data, minutes_data, "debt")
-transcripts_counts <- debt_counts[1:33, ]
-minutes_counts <- debt_counts[34:nrow(debt_counts), ]
-
 # Get counts for lag
 lag_counts <- count_word_appearances(transcripts_data, minutes_data, "lag")
 transcripts_counts <- lag_counts[1:33, ]
