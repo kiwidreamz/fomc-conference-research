@@ -570,12 +570,21 @@ increase_counts <- count_word_appearances(transcripts_data, minutes_data, "rate 
 transcripts_counts <- increase_counts[1:33, ]
 minutes_counts <- increase_counts[34:nrow(increase_counts), ]
 
+# Get counts for savings 
+savings_counts <- count_word_appearances(transcripts_data, minutes_data, "savings")
+transcripts_counts <- savings_counts[1:33, ]
+minutes_counts <- savings_counts[34:nrow(savings_counts), ]
+
+# Get counts for job openings 
+openings_counts <- count_word_appearances(transcripts_data, minutes_data, "job openings")
+transcripts_counts <- openings_counts[1:33, ]
+minutes_counts <- openings_counts[34:nrow(openings_counts), ]
 
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "rate increase"',
+  labs(title = 'Word Frequency Over Time - "job openings"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
