@@ -580,11 +580,16 @@ openings_counts <- count_word_appearances(transcripts_data, minutes_data, "job o
 transcripts_counts <- openings_counts[1:33, ]
 minutes_counts <- openings_counts[34:nrow(openings_counts), ]
 
+# Get counts for soft landing 
+soft_counts <- count_word_appearances(transcripts_data, minutes_data, "soft landing")
+transcripts_counts <- soft_counts[1:33, ]
+minutes_counts <- soft_counts[34:nrow(soft_counts), ]
+
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "job openings"',
+  labs(title = 'Word Frequency Over Time - "soft landing"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
