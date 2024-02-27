@@ -585,11 +585,21 @@ soft_counts <- count_word_appearances(transcripts_data, minutes_data, "soft land
 transcripts_counts <- soft_counts[1:33, ]
 minutes_counts <- soft_counts[34:nrow(soft_counts), ]
 
+# Get counts for peak
+peak_counts <- count_word_appearances(transcripts_data, minutes_data, "peak")
+transcripts_counts <- peak_counts[1:33, ]
+minutes_counts <- peak_counts[34:nrow(peak_counts), ]
+
+# Get counts for neutral
+neutral_counts <- count_word_appearances(transcripts_data, minutes_data, "neutral")
+transcripts_counts <- neutral_counts[1:33, ]
+minutes_counts <- neutral_counts[34:nrow(neutral_counts), ]
+
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "soft landing"',
+  labs(title = 'Word Frequency Over Time - "neutral"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
