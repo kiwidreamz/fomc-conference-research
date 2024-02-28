@@ -465,6 +465,11 @@ inflation_counts <- count_word_appearances(transcripts_data, minutes_data, "infl
 transcripts_counts <- inflation_counts[1:33, ]
 minutes_counts <- inflation_counts[34:nrow(inflation_counts), ]
 
+# Get counts for inflation expectations
+inflation_expectations_counts <- count_word_appearances(transcripts_data, minutes_data, "inflation expectations")
+transcripts_counts <- inflation_expectations_counts[1:33, ]
+minutes_counts <- inflation_expectations_counts[34:nrow(inflation_expectations_counts), ]
+
 # Get counts for disinflation
 disinflation_counts <- count_word_appearances(transcripts_data, minutes_data, "disinflation")
 transcripts_counts <- disinflation_counts[1:33, ]
@@ -475,35 +480,26 @@ deflation_counts <- count_word_appearances(transcripts_data, minutes_data, "defl
 transcripts_counts <- deflation_counts[1:33, ]
 minutes_counts <- deflation_counts[34:nrow(deflation_counts), ]
 
-# Get counts for inflation expectations
-inflation_expectations_counts <- count_word_appearances(transcripts_data, minutes_data, "inflation expectations")
-transcripts_counts <- inflation_expectations_counts[1:33, ]
-minutes_counts <- inflation_expectations_counts[34:nrow(inflation_expectations_counts), ]
+# Get counts for transitory
+transitory_counts <- count_word_appearances(transcripts_data, minutes_data, "transitory")
+transcripts_counts <- transitory_counts[1:33, ]
+minutes_counts <- transitory_counts[34:nrow(transitory_counts), ]
+
+# Get counts for 2 percent
+twopercent_counts <- count_word_appearances(transcripts_data, minutes_data, "2 percent")
+transcripts_counts <- twopercent_counts[1:33, ]
+minutes_counts <- twopercent_counts[34:nrow(twopercent_counts), ]
+
+# Get counts for flexible average
+flexible_counts <- count_word_appearances(transcripts_data, minutes_data, "flexible average")
+transcripts_counts <- flexible_counts[1:33, ]
+minutes_counts <- flexible_counts[34:nrow(flexible_counts), ]
+
 
 # Get counts for unemployment
 unemployment_counts <- count_word_appearances(transcripts_data, minutes_data, "unemployment")
 transcripts_counts <- unemployment_counts[1:33, ]
 minutes_counts <- unemployment_counts[34:nrow(unemployment_counts), ]
-
-# Get counts for stimulus
-stimulus_counts <- count_word_appearances(transcripts_data, minutes_data, "stimulus")
-transcripts_counts <- stimulus_counts[1:33, ]
-minutes_counts <- stimulus_counts[34:nrow(stimulus_counts), ]
-
-# Get counts for easing
-easing_counts <- count_word_appearances(transcripts_data, minutes_data, "easing")
-transcripts_counts <- easing_counts[1:33, ]
-minutes_counts <- easing_counts[34:nrow(easing_counts), ]
-
-# Get counts for tightening
-tightening_counts <- count_word_appearances(transcripts_data, minutes_data, "tightening")
-transcripts_counts <- tightening_counts[1:33, ]
-minutes_counts <- tightening_counts[34:nrow(tightening_counts), ]
-
-# Get counts for transitory
-transitory_counts <- count_word_appearances(transcripts_data, minutes_data, "transitory")
-transcripts_counts <- transitory_counts[1:33, ]
-minutes_counts <- transitory_counts[34:nrow(transitory_counts), ]
 
 # Get counts for tight labor market
 tlm_counts <- count_word_appearances(transcripts_data, minutes_data, "tight labor market|labor market remains tight")
@@ -515,91 +511,67 @@ spiral_counts <- count_word_appearances(transcripts_data, minutes_data, "wage–
 transcripts_counts <- spiral_counts[1:33, ]
 minutes_counts <- spiral_counts[34:nrow(spiral_counts), ]
 
-# Get counts for 2 percent
-twopercent_counts <- count_word_appearances(transcripts_data, minutes_data, "2 percent")
-transcripts_counts <- twopercent_counts[1:33, ]
-minutes_counts <- twopercent_counts[34:nrow(twopercent_counts), ]
 
-# Get counts for lag
-lag_counts <- count_word_appearances(transcripts_data, minutes_data, "lag")
-transcripts_counts <- lag_counts[1:33, ]
-minutes_counts <- lag_counts[34:nrow(lag_counts), ]
-
-# Get counts for restrictive
-restrictive_counts <- count_word_appearances(transcripts_data, minutes_data, "sufficiently restrictive")
-transcripts_counts <- restrictive_counts[1:33, ]
-minutes_counts <- restrictive_counts[34:nrow(restrictive_counts), ]
-
-# Get counts for real rate
-real_rate_counts <- count_word_appearances(transcripts_data, minutes_data, "real rate")
-transcripts_counts <- real_rate_counts[1:33, ]
-minutes_counts <- real_rate_counts[34:nrow(real_rate_counts), ]
-
-# Get counts for rate hike
-hike_counts <- count_word_appearances(transcripts_data, minutes_data, "hik")
-transcripts_counts <- hike_counts[1:33, ]
-minutes_counts <- hike_counts[34:nrow(hike_counts), ]
-
-# Get counts for raise rates
-raise_counts <- count_word_appearances(transcripts_data, minutes_data, "raise interest rates|raise rates")
-transcripts_counts <- raise_counts[1:33, ]
-minutes_counts <- raise_counts[34:nrow(raise_counts), ]
-
-# Get counts for rate cuts
-cut_counts <- count_word_appearances(transcripts_data, minutes_data, "cuts|rate cut|cutting")
-transcripts_counts <- cut_counts[1:33, ]
-minutes_counts <- cut_counts[34:nrow(cut_counts), ]
-
-# Get counts for flexible average
-flexible_counts <- count_word_appearances(transcripts_data, minutes_data, "flexible average")
-transcripts_counts <- flexible_counts[1:33, ]
-minutes_counts <- flexible_counts[34:nrow(flexible_counts), ]
-
-# Get counts for bank
-bank_counts <- count_word_appearances(transcripts_data, minutes_data, "regional bank")
-transcripts_counts <- bank_counts[1:33, ]
-minutes_counts <- bank_counts[34:nrow(bank_counts), ]
+# Get counts for stimulus
+stimulus_counts <- count_word_appearances(transcripts_data, minutes_data, "stimulus")
+transcripts_counts <- stimulus_counts[1:33, ]
+minutes_counts <- stimulus_counts[34:nrow(stimulus_counts), ]
 
 # Get counts for taper 
 taper_counts <- count_word_appearances(transcripts_data, minutes_data, "taper")
 transcripts_counts <- taper_counts[1:33, ]
 minutes_counts <- taper_counts[34:nrow(taper_counts), ]
 
+# Get counts for hikes
+hike_counts <- count_word_appearances(transcripts_data, minutes_data, "hik")
+transcripts_counts <- hike_counts[1:33, ]
+minutes_counts <- hike_counts[34:nrow(hike_counts), ]
+
 # Get counts for rate increases 
 increase_counts <- count_word_appearances(transcripts_data, minutes_data, "rate increase")
 transcripts_counts <- increase_counts[1:33, ]
 minutes_counts <- increase_counts[34:nrow(increase_counts), ]
 
-# Get counts for savings 
-savings_counts <- count_word_appearances(transcripts_data, minutes_data, "savings")
-transcripts_counts <- savings_counts[1:33, ]
-minutes_counts <- savings_counts[34:nrow(savings_counts), ]
-
-# Get counts for job openings 
-openings_counts <- count_word_appearances(transcripts_data, minutes_data, "job openings")
-transcripts_counts <- openings_counts[1:33, ]
-minutes_counts <- openings_counts[34:nrow(openings_counts), ]
-
-# Get counts for soft landing 
-soft_counts <- count_word_appearances(transcripts_data, minutes_data, "soft landing")
-transcripts_counts <- soft_counts[1:33, ]
-minutes_counts <- soft_counts[34:nrow(soft_counts), ]
+# Get counts for raise rates
+raise_counts <- count_word_appearances(transcripts_data, minutes_data, "raise interest rates|raise rates")
+transcripts_counts <- raise_counts[1:33, ]
+minutes_counts <- raise_counts[34:nrow(raise_counts), ]
 
 # Get counts for peak
 peak_counts <- count_word_appearances(transcripts_data, minutes_data, "peak")
 transcripts_counts <- peak_counts[1:33, ]
 minutes_counts <- peak_counts[34:nrow(peak_counts), ]
 
+# Get counts for rate cuts
+cut_counts <- count_word_appearances(transcripts_data, minutes_data, "cuts|rate cut|cutting")
+transcripts_counts <- cut_counts[1:33, ]
+minutes_counts <- cut_counts[34:nrow(cut_counts), ]
+
 # Get counts for neutral
 neutral_counts <- count_word_appearances(transcripts_data, minutes_data, "neutral")
 transcripts_counts <- neutral_counts[1:33, ]
 minutes_counts <- neutral_counts[34:nrow(neutral_counts), ]
 
+# Get counts for real rate
+real_rate_counts <- count_word_appearances(transcripts_data, minutes_data, "real rate")
+transcripts_counts <- real_rate_counts[1:33, ]
+minutes_counts <- real_rate_counts[34:nrow(real_rate_counts), ]
+
+# Get counts for restrictive
+restrictive_counts <- count_word_appearances(transcripts_data, minutes_data, "sufficiently restrictive")
+transcripts_counts <- restrictive_counts[1:33, ]
+minutes_counts <- restrictive_counts[34:nrow(restrictive_counts), ]
+
+# Get counts for lag
+lag_counts <- count_word_appearances(transcripts_data, minutes_data, "lag")
+transcripts_counts <- lag_counts[1:33, ]
+minutes_counts <- lag_counts[34:nrow(lag_counts), ]
+
 # Time series plot (manually update title every time)
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "neutral"',
+  labs(title = 'Word Frequency Over Time - "lag"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
