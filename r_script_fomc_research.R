@@ -571,7 +571,7 @@ minutes_counts <- lag_counts[34:nrow(lag_counts), ]
 ggplot(transcripts_counts, aes(x = DATE)) +
   geom_line(aes(y = Transcripts_Appearances, color = "Transcripts"), size = 1) +
   geom_line(data = minutes_counts, aes(x = DATE, y = Minutes_Appearances, color = "Minutes"), size = 1) +
-  labs(title = 'Word Frequency Over Time - "lag"',
+  labs(title = 'Word Frequency Over Time - "cuts|rate cut|cutting"',
        x = "Date",
        y = "Word Count") +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
@@ -636,4 +636,18 @@ lines(rr10$DATE, rrm$REAINTRATREARAT1MO, col = "firebrick1", lwd = 2)
 abline(h = 0, col = "gray57", lty = 2)
 
 legend("topleft", legend = c("1-Month", "1-Year",  "10-Year"), col = c("firebrick1", "deepskyblue3", "forestgreen"), lwd = 2)
+
+################################
+# COMPLETE CORPUS
+################################
+
+transcripts_data$DATE <- as.Date(transcripts_data$DATE)
+minutes_data$DATE <- as.Date(minutes_data$DATE)
+
+merged_data <- merge(transcripts_data, minutes_data, by = "DATE", all = TRUE)
+merged_data <- transform(merged_data, complete_corpus = paste(TEXT.x, TEXT.y, sep = " "))
+sorted_data <- merged_data[order(merged_data$DATE), ]
+complete_corpus <- sorted_data[, c("DATE", "complete_corpus")]
+
+writeLines(complete_corpus$complete_corpus, "complete_corpus.txt")
 
