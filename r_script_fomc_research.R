@@ -638,7 +638,7 @@ abline(h = 0, col = "gray57", lty = 2)
 legend("topleft", legend = c("1-Month", "1-Year",  "10-Year"), col = c("firebrick1", "deepskyblue3", "forestgreen"), lwd = 2)
 
 ################################
-# COMPLETE CORPUS
+# COMPLETE CORPUS TEXT
 ################################
 
 transcripts_data$DATE <- as.Date(transcripts_data$DATE)
