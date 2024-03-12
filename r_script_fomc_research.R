@@ -4,6 +4,7 @@ library(stringr)
 library(tm)
 library(sentimentr)
 library(ggplot2)
+library(fuzzyjoin)
 
 
 ################################
@@ -650,4 +651,78 @@ sorted_data <- merged_data[order(merged_data$DATE), ]
 complete_corpus <- sorted_data[, c("DATE", "complete_corpus")]
 
 writeLines(complete_corpus$complete_corpus, "complete_corpus.txt")
+
+
+################################
+# HYPOTHESIS TESTING
+################################
+
+# Transcripts vs Minutes
+transcripts_subset <- transcripts_sentiment[c("ID", "Sentiment_Score")]
+minutes_subset <- minutes_sentiment[c("ID", "Sentiment_Score")]
+transcripts_vs_minutes <- merge(transcripts_subset, minutes_subset, by = "ID", suffixes = c("_transcripts", "_minutes"))
+transcripts_vs_minutes$Absolute_Sentiment_Difference <- abs(transcripts_vs_minutes$Sentiment_Score_transcripts - transcripts_vs_minutes$Sentiment_Score_minutes)
+t_test_result <- t.test(transcripts_vs_minutes$Absolute_Sentiment_Difference)
+
+# Statements vs Minutes
+statement_subset <- statements_sentiment[c("ID", "Sentiment_Score")]
+minutes_subset <- minutes_sentiment[c("ID", "Sentiment_Score")]
+statements_vs_minutes <- merge(statement_subset, minutes_subset, by = "ID", suffixes = c("_statements", "_minutes"))
+statements_vs_minutes$Absolute_Sentiment_Difference <- abs(statements_vs_minutes$Sentiment_Score_statements - statements_vs_minutes$Sentiment_Score_minutes)
+t_test_result <- t.test(statements_vs_minutes$Absolute_Sentiment_Difference)
+
+# Statements vs Q&A
+statement_subset <- statements_sentiment[c("ID", "Sentiment_Score")]
+q_and_a_subset <- q_and_a_sentiment[c("ID", "Sentiment_Score")]
+statements_vs_q_and_a <- merge(statement_subset, q_and_a_subset, by = "ID", suffixes = c("_statements", "_QA"))
+statements_vs_q_and_a$Absolute_Sentiment_Difference <- abs(statements_vs_q_and_a$Sentiment_Score_statements - statements_vs_q_and_a$Sentiment_Score_QA)
+t_test_result <- t.test(statements_vs_q_and_a$Absolute_Sentiment_Difference)
+
+# Hike vs Increase & Raise
+merged_data <- merge(merge(hike_counts, increase_counts, by = "DATE", suffixes = c("_hike", "_increase")), raise_counts, by = "DATE")
+colnames(merged_data) <- c("DATE", "hike_t", "hike_m", "increase_t", "increase_m", "raise_t", "raise_m")
+contingency_table <- table(merged_data$hike_t, merged_data$hike_m, merged_data$increase_t, merged_data$increase_m, merged_data$raise_t, merged_data$raise_m)
+contingency_matrix <- as.matrix(contingency_table)
+chi_squared_result <- chisq.test(contingency_matrix)
+
+# Merging rows 4 and 5 which was an emergency meeting
+merged_data[4, 2:7] <- merged_data[4, 2:7] + merged_data[5, 2:7]
+merged_data <- merged_data[-5, ]
+rownames(merged_data) <- NULL
+
+# Combining minutes and transcripts dates
+numeric_cols <- sapply(merged_data, is.numeric)
+merged_data[is.na(merged_data)] <- 0
+merged_data <- merged_data[, numeric_cols]
+merged_data <- merged_data[, !grepl("DATE", names(merged_data))]
+combined_data <- merged_data[1, ]
+
+for (i in seq(2, nrow(merged_data), by = 2)) {
+  combined_data <- rbind(combined_data, colSums(merged_data[i:(i + 1), ], na.rm = TRUE))
+}
+
+rownames(combined_data) <- seq_len(nrow(combined_data))
+combined_data <- combined_data[-nrow(combined_data), ]
+
+# Combining minutes and transcripts frequency counts
+combined_data <- data.frame(
+  hike = combined_data$hike_t + combined_data$hike_m,
+  increase = combined_data$increase_t + combined_data$increase_m,
+  raise = combined_data$raise_t + combined_data$raise_m
+)
+
+# Combine with data frame showing the meetings that saw an interest rate increase AT THE NEXT MEETING
+next_meeting_rate_increase = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0)
+combined_data$nextt <- next_meeting_rate_increase
+
+# Calculate probabilities
+prob_hike_positive_nextt <- sum(combined_data$hike > 0 & combined_data$nextt == 1) / sum(combined_data$hike > 0)
+prob_increase_positive_nextt <- sum(combined_data$increase > 0 & combined_data$nextt == 1) / sum(combined_data$increase > 0)
+prob_raise_positive_nextt <- sum(combined_data$raise > 0 & combined_data$nextt == 1) / sum(combined_data$raise > 0)
+
+cat("\n",
+  "Probability of hike leading to higher rates at the next meeting:", prob_hike_positive_nextt, "\n",
+  "Probability of increase leading to higher rates at the next meeting:", prob_increase_positive_nextt, "\n",
+  "Probability of raise leading to higher rates at the next meeting:", prob_raise_positive_nextt, "\n"
+)
 
