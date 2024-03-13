@@ -5,6 +5,8 @@ library(tm)
 library(sentimentr)
 library(ggplot2)
 library(fuzzyjoin)
+library(dplyr)
+
 
 
 ################################
@@ -578,7 +580,6 @@ ggplot(transcripts_counts, aes(x = DATE)) +
   scale_color_manual(values = c("Transcripts" = "mediumblue", "Minutes" = "seagreen1")) +
   theme_minimal()
 
-
 ################################
 # UNEMPLOYMENT
 ################################
@@ -680,6 +681,7 @@ t_test_result <- t.test(statements_vs_q_and_a$Absolute_Sentiment_Difference)
 
 # Hike vs Increase & Raise
 merged_data <- merge(merge(hike_counts, increase_counts, by = "DATE", suffixes = c("_hike", "_increase")), raise_counts, by = "DATE")
+
 colnames(merged_data) <- c("DATE", "hike_t", "hike_m", "increase_t", "increase_m", "raise_t", "raise_m")
 contingency_table <- table(merged_data$hike_t, merged_data$hike_m, merged_data$increase_t, merged_data$increase_m, merged_data$raise_t, merged_data$raise_m)
 contingency_matrix <- as.matrix(contingency_table)
@@ -715,10 +717,19 @@ combined_data <- data.frame(
 next_meeting_rate_increase = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0)
 combined_data$nextt <- next_meeting_rate_increase
 
+# Counts
+hike_count <- sum(combined_data$hike)
+increase_count <- sum(combined_data$increase)
+raise_count <- sum(combined_data$raise)
+
+cat("Total count of 'hike':", sum(combined_data$hike), "\n",
+    "Total count of 'increase':", sum(combined_data$increase), "\n",
+    "Total count of 'raise':", sum(combined_data$raise), "\n")
+
 # Calculate probabilities
-prob_hike_positive_nextt <- sum(combined_data$hike > 0 & combined_data$nextt == 1) / sum(combined_data$hike > 0)
-prob_increase_positive_nextt <- sum(combined_data$increase > 0 & combined_data$nextt == 1) / sum(combined_data$increase > 0)
-prob_raise_positive_nextt <- sum(combined_data$raise > 0 & combined_data$nextt == 1) / sum(combined_data$raise > 0)
+prob_hike_positive_nextt <- sum(combined_data$hike[combined_data$nextt == 1]) / hike_count
+prob_increase_positive_nextt <- sum(combined_data$increase[combined_data$nextt == 1]) / increase_count
+prob_raise_positive_nextt <- sum(combined_data$raise[combined_data$nextt == 1]) / raise_count
 
 cat("\n",
   "Probability of hike leading to higher rates at the next meeting:", prob_hike_positive_nextt, "\n",
@@ -726,3 +737,18 @@ cat("\n",
   "Probability of raise leading to higher rates at the next meeting:", prob_raise_positive_nextt, "\n"
 )
 
+sum(combined_data$hike[combined_data$nextt == 1])
+
+# Average Percentage Increase
+next_meet_rate_increase = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.25, 0.5, 0.75, 0.75, 0.75, 0.75, 0.5, 0.25, 0.25, 0.25, 0, 0.25, 0, 0, 0, 0)
+combined_data$next_amount <- next_meet_rate_increase
+
+prob_hike_amount <- sum(combined_data$hike * combined_data$next_amount) / hike_count
+prob_increase_amount <- sum(combined_data$increase * combined_data$next_amount) / increase_count
+prob_raise_amount <- sum(combined_data$raise * combined_data$next_amount) / raise_count
+
+cat("\n",
+    "Average rate increase following usage of the term hike:", prob_hike_amount, "\n",
+    "Average rate increase following usage of the term increase:", prob_increase_amount, "\n",
+    "Average rate increase following usage of the term raise:", prob_raise_amount, "\n"
+)
